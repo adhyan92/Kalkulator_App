@@ -7,9 +7,15 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawingPadding
+import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -22,6 +28,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.kalkulator_app.ui.theme.Kalkulator_AppTheme
@@ -33,7 +40,8 @@ class MainActivity : ComponentActivity() {
         setContent {
             Kalkulator_AppTheme {
                 Scaffold (modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    TaxLayout(modifier = Modifier.padding(innerPadding))
+                    TaxLayout(
+                        modifier = Modifier.padding(innerPadding))
                     }
                 }
             }
@@ -49,34 +57,41 @@ fun EditTextNumber(
     value: String,
     onValueChange: (String) -> Unit,
     modifier: Modifier = Modifier
+
 ) {
     TextField(
         value = value,
         onValueChange = onValueChange,
         label = { Text(stringResource(R.string.bill_amount)) },
+        singleLine = true,
+        keyboardOptions = KeyboardOptions(keyboardType =
+            KeyboardType.Number
+        ),
         modifier = Modifier
     )
 }
-
-
 
 @Composable
 fun TaxLayout(modifier: Modifier = Modifier) {
 
     var amountInput by remember { mutableStateOf("") }
 
-    val amount = amountInput.toDoubleOrNull() ?: 0.00
+    val amount = amountInput.toDoubleOrNull() ?: 0.0
     val tax = calculateTax(amount)
 
     Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center,
-        modifier = Modifier.padding(40.dp)
+        modifier = Modifier
+            .statusBarsPadding()
+            .padding(horizontal = 40.dp)
+            .safeDrawingPadding()
+            .width(350.dp),
+        horizontalAlignment = Alignment.Start,
+        verticalArrangement = Arrangement.Center
     ) {
         Text(
             text = stringResource(R.string.calculate_tax),
             modifier = Modifier
-                .padding(bottom = 16.dp, top = 40.dp)
+                .padding(bottom = 20.dp, top = 40.dp)
                 .align(alignment = Alignment.Start)
         )
         EditTextNumber(
@@ -84,11 +99,13 @@ fun TaxLayout(modifier: Modifier = Modifier) {
             onValueChange = { amountInput = it },
             modifier = Modifier
                 .padding(bottom = 32.dp)
-                .fillMaxWidth()
+                .fillMaxSize()
         )
 
+        Spacer ( modifier = Modifier.height(24.dp))
+
         Text(
-            text = stringResource(R.string.tax_amount_0_00, ),
+            text = stringResource(R.string.Tax_amount, tax),
             style = MaterialTheme.typography.displaySmall
         )
     }
