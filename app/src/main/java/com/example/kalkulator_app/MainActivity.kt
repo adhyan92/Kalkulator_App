@@ -1,12 +1,15 @@
 package com.example.kalkulator_app
 
+import android.R.attr.label
 import android.icu.text.NumberFormat
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -15,6 +18,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -28,6 +32,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -48,12 +53,40 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-fun calculateTax(amount: Double, taxRate: Double = 10.0):String {
-    val tax = amount * taxRate / 100
+fun calculateTax(
+    amount: Double,
+    taxRate: Double = 10.0,
+    roundUp: Boolean
+):String {
+    var tax = amount * taxRate / 100
+    if (roundUp == true) {
+        tax = kotlin.math.ceil(x = tax)
+    }
     return NumberFormat.getCurrencyInstance().format(tax);
 }
+
+@Composable
+fun SwitchTax(
+    roundUp: Boolean,
+    onRoundUpChanged: (Boolean) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Row {
+        Text(text = stringResource(R.string.round_up_tax))
+        androidx.compose.material3.Switch(
+            checked = roundUp,
+            onCheckedChange = onRoundUpChanged,
+            modifier = modifier
+                .fillMaxWidth()
+                .wrapContentWidth(Alignment.End)
+        )
+    }
+}
+
 @Composable
 fun EditTextNumber(
+    @StringRes label: Int,
+    keyboardOptions: KeyboardOptions,
     value: String,
     onValueChange: (String) -> Unit,
     modifier: Modifier = Modifier
@@ -62,22 +95,23 @@ fun EditTextNumber(
     TextField(
         value = value,
         onValueChange = onValueChange,
-        label = { Text(stringResource(R.string.bill_amount)) },
+        label = { Text(stringResource(label)) },
         singleLine = true,
-        keyboardOptions = KeyboardOptions(keyboardType =
-            KeyboardType.Number
-        ),
+        keyboardOptions = keyboardOptions,
         modifier = Modifier
-    )
+        )
 }
 
 @Composable
 fun TaxLayout(modifier: Modifier = Modifier) {
 
     var amountInput by remember { mutableStateOf("") }
-
+    var taxInput by remember { mutableStateOf(value = "") }
     val amount = amountInput.toDoubleOrNull() ?: 0.0
-    val tax = calculateTax(amount)
+    var roundUp by remember { mutableStateOf(value = false)}
+    val taxPercentage = taxInput.toDoubleOrNull() ?: 0.0
+
+    val tax = calculateTax(amount, taxPercentage, roundUp)
 
     Column(
         modifier = Modifier
@@ -95,11 +129,37 @@ fun TaxLayout(modifier: Modifier = Modifier) {
                 .align(alignment = Alignment.Start)
         )
         EditTextNumber(
+            label = R.string.bill_amount,
+            keyboardOptions = KeyboardOptions.Default.copy(
+                keyboardType = KeyboardType.Number,
+                imeAction = ImeAction.Next
+            ),
             value = amountInput,
             onValueChange = { amountInput = it },
             modifier = Modifier
                 .padding(bottom = 32.dp)
                 .fillMaxSize()
+        )
+
+        Spacer ( modifier = Modifier.height(24.dp))
+
+        EditTextNumber(
+            label = R.string.tax_percentage,
+            keyboardOptions = KeyboardOptions.Default.copy(
+                keyboardType = KeyboardType.Number,
+                imeAction = ImeAction.Done
+            ),
+            value = taxInput,
+            onValueChange = { taxInput = it },
+            modifier = Modifier
+                .padding(bottom = 32.dp)
+                .fillMaxSize()
+        )
+
+        SwitchTax(
+            roundUp = roundUp,
+            onRoundUpChanged = { roundUp = it },
+            modifier = Modifier.padding(bottom = 32.dp)
         )
 
         Spacer ( modifier = Modifier.height(24.dp))
