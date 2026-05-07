@@ -7,6 +7,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.annotation.StringRes
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -16,6 +17,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
@@ -36,6 +38,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.kalkulator_app.ui.theme.Kalkulator_AppTheme
 
 class MainActivity : ComponentActivity() {
@@ -62,7 +65,8 @@ fun calculateTax(
     if (roundUp == true) {
         tax = kotlin.math.ceil(x = tax)
     }
-    return NumberFormat.getCurrencyInstance().format(tax);
+
+    return NumberFormat.getCurrencyInstance(java.util.Locale("in", "ID")).format(tax);
 }
 
 @Composable
@@ -98,7 +102,7 @@ fun EditTextNumber(
         label = { Text(stringResource(label)) },
         singleLine = true,
         keyboardOptions = keyboardOptions,
-        modifier = Modifier
+        modifier = Modifier.fillMaxWidth()
         )
 }
 
@@ -156,6 +160,8 @@ fun TaxLayout(modifier: Modifier = Modifier) {
                 .fillMaxSize()
         )
 
+        Spacer ( modifier = Modifier.height(24.dp))
+
         SwitchTax(
             roundUp = roundUp,
             onRoundUpChanged = { roundUp = it },
@@ -166,7 +172,9 @@ fun TaxLayout(modifier: Modifier = Modifier) {
 
         Text(
             text = stringResource(R.string.Tax_amount, tax),
-            style = MaterialTheme.typography.displaySmall
+            style = MaterialTheme.typography.displaySmall,
+            modifier = Modifier,
+            fontSize = 26.sp
         )
     }
 }
