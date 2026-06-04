@@ -6,6 +6,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
@@ -21,7 +22,10 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -33,6 +37,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -90,6 +95,7 @@ fun SwitchTax(
 @Composable
 fun EditTextNumber(
     @StringRes label: Int,
+    @DrawableRes leadingIcon : Int,
     keyboardOptions: KeyboardOptions,
     value: String,
     onValueChange: (String) -> Unit,
@@ -101,6 +107,7 @@ fun EditTextNumber(
         onValueChange = onValueChange,
         label = { Text(stringResource(label)) },
         singleLine = true,
+        leadingIcon = { Icon(painter = painterResource(id = leadingIcon),null )},
         keyboardOptions = keyboardOptions,
         modifier = Modifier.fillMaxWidth()
         )
@@ -121,10 +128,13 @@ fun TaxLayout(modifier: Modifier = Modifier) {
         modifier = Modifier
             .statusBarsPadding()
             .padding(horizontal = 40.dp)
+            .verticalScroll(rememberScrollState())
+            .fillMaxSize()
             .safeDrawingPadding()
             .width(350.dp),
         horizontalAlignment = Alignment.Start,
         verticalArrangement = Arrangement.Center
+
     ) {
         Text(
             text = stringResource(R.string.calculate_tax),
@@ -140,6 +150,7 @@ fun TaxLayout(modifier: Modifier = Modifier) {
             ),
             value = amountInput,
             onValueChange = { amountInput = it },
+            leadingIcon = R.drawable.ic_uang_bag,
             modifier = Modifier
                 .padding(bottom = 32.dp)
                 .fillMaxSize()
@@ -155,6 +166,7 @@ fun TaxLayout(modifier: Modifier = Modifier) {
             ),
             value = taxInput,
             onValueChange = { taxInput = it },
+            leadingIcon = R.drawable.ic_percent,
             modifier = Modifier
                 .padding(bottom = 32.dp)
                 .fillMaxSize()
